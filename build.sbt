@@ -24,10 +24,10 @@ val SLF4SVersion = "1.7.25"
 lazy val root = project
   .in(file("."))
   .settings(noPublishSettings)
-  .aggregate(datasource)
+  .aggregate(core)
 
-lazy val datasource = project
-  .in(file("datasource"))
+lazy val core = project
+  .in(file("core"))
   .settings(
     name := "quasar-datasource-gcs",
 

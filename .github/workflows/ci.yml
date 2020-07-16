@@ -95,11 +95,11 @@ jobs:
           name: target-${{ matrix.os }}-${{ matrix.scala }}-${{ matrix.java }}-target
           path: target
 
-      - name: Upload target directory 'datasource/target' (${{ matrix.scala }})
+      - name: Upload target directory 'core/target' (${{ matrix.scala }})
         uses: actions/upload-artifact@v1
         with:
-          name: target-${{ matrix.os }}-${{ matrix.scala }}-${{ matrix.java }}-datasource_target
-          path: datasource/target
+          name: target-${{ matrix.os }}-${{ matrix.scala }}-${{ matrix.java }}-core_target
+          path: core/target
 
       - name: Upload target directory 'project/target'
         uses: actions/upload-artifact@v1
@@ -171,11 +171,11 @@ jobs:
           name: target-${{ matrix.os }}-2.12.10-${{ matrix.java }}-target
           path: target
 
-      - name: Download target directory 'datasource/target' (2.12.10)
+      - name: Download target directory 'core/target' (2.12.10)
         uses: actions/download-artifact@v1
         with:
-          name: target-${{ matrix.os }}-2.12.10-${{ matrix.java }}-datasource_target
-          path: datasource/target
+          name: target-${{ matrix.os }}-2.12.10-${{ matrix.java }}-core_target
+          path: core/target
 
       - name: Download target directory 'project/target'
         uses: actions/download-artifact@v1
