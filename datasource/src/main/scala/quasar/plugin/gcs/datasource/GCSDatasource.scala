@@ -22,7 +22,7 @@ import scala.Predef._
 import quasar.api.datasource.DatasourceType
 import quasar.api.resource.{ResourceName, ResourcePath, ResourcePathType}
 import quasar.connector.QueryResult
-import quasar.connector.datasource.{LightweightDatasource, Loader}
+import quasar.connector.datasource.{BatchLoader, LightweightDatasource, Loader}
 import quasar.qscript.InterpretedRead
 
 import cats.data.NonEmptyList
@@ -39,7 +39,12 @@ final class GCSDatasource[F[_]](
 
   val kind: DatasourceType = GCSDatasourceModule.kind
 
-  val loaders: NonEmptyList[Loader[Resource[F, ?], InterpretedRead[ResourcePath], QueryResult[F]]] = ???
+  val loaders: NonEmptyList[Loader[Resource[F, ?], InterpretedRead[ResourcePath], QueryResult[F]]] = {
+    val loader: Loader[Resource[F, ?], InterpretedRead[ResourcePath], QueryResult[F]] =
+      Loader.Batch(BatchLoader.Full(q => ???))
+
+    NonEmptyList.one(loader)
+  }
 
   def pathIsResource(path: ResourcePath): Resource[F, Boolean] = ???
 
