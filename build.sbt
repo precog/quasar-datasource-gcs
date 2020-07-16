@@ -15,11 +15,36 @@ ThisBuild / publishAsOSSProject := true
 lazy val publishTestsSettings = Seq(
   Test / packageBin / publishArtifact := true)
 
+lazy val quasarVersion =
+  Def.setting[String](managedVersions.value("precog-quasar"))
+
+val Specs2Version = "4.9.4"
+val SLF4SVersion = "1.7.25"
+
 lazy val root = project
   .in(file("."))
   .settings(noPublishSettings)
-  .aggregate(core)
+  .aggregate(datasource)
 
-lazy val core = project
-  .in(file("core"))
-  .settings(name := "quasar-datasource-gcs")
+lazy val datasource = project
+  .in(file("datasource"))
+  .settings(
+    name := "quasar-datasource-gcs",
+
+    quasarPluginName := "gcs",
+
+    quasarPluginQuasarVersion := quasarVersion.value,
+
+    quasarPluginDatasourceFqcn := Some("quasar.plugin.gcs.datasource.GCSDatasourceModule$"),
+
+    // The quasarPluginDependencies key is analogous to libraryDependencies, except it
+    // will be considered as part of the assembly and packaging process for your plugin.
+    // You should declare all of your non-Test dependencies using this key rather than
+    // libraryDependencies.
+    quasarPluginDependencies ++= Seq(
+      "org.slf4s" %% "slf4s-api" % SLF4SVersion),
+
+    libraryDependencies ++= Seq(
+      "org.specs2" %% "specs2-core" % Specs2Version % Test))
+
+  .enablePlugins(QuasarPlugin)
