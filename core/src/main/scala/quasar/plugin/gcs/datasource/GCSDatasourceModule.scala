@@ -30,7 +30,7 @@ import quasar.connector.datasource.Reconfiguration
 
 import argonaut.Json
 
-import cats.effect.{ConcurrentEffect, ContextShift, Resource, Timer}
+import cats.effect.{ConcurrentEffect, ContextShift, Resource, Sync, Timer}
 import cats.kernel.Hash
 
 import org.slf4s.Logging
@@ -50,4 +50,6 @@ object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
        : Either[ConfigurationError[Json], (Reconfiguration, Json)] = ???
 
    def sanitizeConfig(config: Json): Json = ???
+
+   def migrateConfig[F[_]: Sync](config: Json): F[Either[ConfigurationError[Json], Json]] = ???
 }
