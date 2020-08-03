@@ -18,6 +18,8 @@ package quasar.plugin.gcs.datasource
 
 import quasar.connector.datasource.LightweightDatasourceModule
 
+import java.util.UUID
+
 import scala._
 import scala.Predef._
 import scala.concurrent.ExecutionContext
@@ -25,7 +27,7 @@ import scala.concurrent.ExecutionContext
 import quasar.RateLimiting
 import quasar.api.datasource.DatasourceType
 import quasar.api.datasource.DatasourceError.{ConfigurationError, InitializationError}
-import quasar.connector.{ByteStore, MonadResourceErr}
+import quasar.connector.{ByteStore, MonadResourceErr, ExternalCredentials}
 import quasar.connector.datasource.Reconfiguration
 
 import argonaut.Json
@@ -42,7 +44,8 @@ object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
    def lightweightDatasource[F[_]: ConcurrentEffect: ContextShift: MonadResourceErr: Timer, A: Hash](
        config: Json,
        rateLimiting: RateLimiting[F, A],
-       byteStore: ByteStore[F])(
+       byteStore: ByteStore[F],
+       getAuth: UUID => F[Option[ExternalCredentials[F]]])(
        implicit ec: ExecutionContext)
        : Resource[F, Either[InitializationError[Json], LightweightDatasourceModule.DS[F]]] = ???
 
