@@ -54,6 +54,6 @@ object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
 
    def sanitizeConfig(config: Json): Json = ???
 
-   def migrateConfig[F[_]: Sync](config: Json): F[Either[ConfigurationError[Json], Json]] =
+   def migrateConfig[F[_]: Sync](from: Long, to: Long, config: Json): F[Either[ConfigurationError[Json], Json]] =
      Sync[F].pure(Right(config))
 }
