@@ -57,8 +57,8 @@ object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
     json.as[GCSConfig].result match {
       case Right(cfg) =>
         val r = for {
-          ds <- GCSDatasource.mk(cfg)
-          l <- ds.status
+          ds <- GCSDatasource.mk(log, cfg)
+          l <- Resource.liftF(ds.status)
           res = l match {
             case BlobstoreStatus.Ok =>
               Right(ds.asDsType)
@@ -77,7 +77,7 @@ object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
           }
         } yield res
 
-        Resource.liftF(ApplicativeError[F, Throwable].handleError(r) {
+        ApplicativeError[Resource[F, *], Throwable].handleError(r) {
           case _: MalformedURLException =>
             Left(DatasourceError
               .invalidConfiguration[Json, InitializationError[Json]](kind, sanitizedJson, NonEmptyList("Invalid storage url")))
@@ -89,7 +89,7 @@ object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
           case NonFatal(t) =>
             Left(DatasourceError
               .invalidConfiguration[Json, InitializationError[Json]](kind, sanitizedJson, NonEmptyList(t.getMessage)))
-        })
+        }
 
       case Left((msg, _)) =>
         DatasourceError

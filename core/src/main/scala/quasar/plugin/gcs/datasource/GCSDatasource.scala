@@ -16,49 +16,32 @@
 
 package quasar.plugin.gcs.datasource
 
-import scala._
-import scala.Predef._
-
 import quasar.api.datasource.DatasourceType
-import quasar.api.resource.{ResourceName, ResourcePath, ResourcePathType}
-import quasar.connector.QueryResult
-import quasar.connector.datasource.{BatchLoader, LightweightDatasource, Loader}
-import quasar.qscript.InterpretedRead
-
-import cats.data.NonEmptyList
-import cats.effect.{Concurrent, ConcurrentEffect, Resource}
-
-import fs2.Stream
-
-import org.slf4s.Logging
+import quasar.blobstore.gcs.{GCSGetService, GCSListService, GCSStatusService, GoogleCloudStorage}
+import quasar.connector.MonadResourceErr
 import quasar.physical.blobstore.BlobstoreDatasource
-import quasar.blobstore.gcs.GoogleCloudStorage
-import cats.effect.ContextShift
+
+import cats.effect.{Concurrent, ConcurrentEffect, ContextShift, Resource, Timer}
 import org.http4s.client.Client
-
-final class GCSDatasource[F[_]](
-    config: GCSConfig)
-    extends LightweightDatasource[Resource[F, ?], Stream[F, ?], QueryResult[F]]
-    with Logging {
-
-  val kind: DatasourceType = GCSDatasourceModule.kind
-
-  val loaders: NonEmptyList[Loader[Resource[F, ?], InterpretedRead[ResourcePath], QueryResult[F]]] = {
-    val loader: Loader[Resource[F, ?], InterpretedRead[ResourcePath], QueryResult[F]] =
-      Loader.Batch(BatchLoader.Full(q => ???))
-
-    NonEmptyList.one(loader)
-  }
-
-  def pathIsResource(path: ResourcePath): Resource[F, Boolean] = ???
-
-  def prefixedChildPaths(prefixPath: ResourcePath)
-      : Resource[F, Option[Stream[F,(ResourceName, ResourcePathType.Physical)]]] = ???
-}
+import org.slf4s.Logger
 
 object GCSDatasource {
-  def mk[F[_]: Concurrent: ConcurrentEffect: ContextShift](cfg: GCSConfig): F[BlobstoreDatasource[F, Client[F]]] = {
-    val x: Resource[F, Client[F]] = GoogleCloudStorage.mkContainerClient(cfg.gac)
-    x.asInstanceOf[F[BlobstoreDatasource[F, Client[F]]]]
+  val dsType: DatasourceType = DatasourceType("gcs", 1L)
+
+  def mk[F[_]: Concurrent: ConcurrentEffect: ContextShift: MonadResourceErr: Timer](
+      log: Logger,
+      cfg: GCSConfig)
+      : Resource[F, BlobstoreDatasource[F, Client[F]]] = {
+
+    for {
+      client <- GoogleCloudStorage.mkContainerClient(cfg.gac)
+    } yield
+        BlobstoreDatasource[F, Client[F]](
+          dsType, 
+          cfg.format,
+          GCSStatusService[F](client, cfg.bucket, cfg.gac),
+          GCSListService[F](log, client, cfg.bucket),
+          scala.Predef.???,
+          GCSGetService.mk[F](client, cfg.bucket, cfg.gac))
   }
 }
