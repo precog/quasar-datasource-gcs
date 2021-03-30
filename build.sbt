@@ -19,7 +19,8 @@ lazy val quasarVersion =
   Def.setting[String](managedVersions.value("precog-quasar"))
 
 val Specs2Version = "4.9.4"
-val SLF4SVersion = "1.7.25"
+val Http4sVersion = "0.21.13"
+val Slf4sVersion = "1.7.25"
 
 lazy val root = project
   .in(file("."))
@@ -42,7 +43,10 @@ lazy val core = project
     // You should declare all of your non-Test dependencies using this key rather than
     // libraryDependencies.
     quasarPluginDependencies ++= Seq(
-      "org.slf4s" %% "slf4s-api" % SLF4SVersion),
+      "com.precog" %% "async-blobstore-gcs" % managedVersions.value("precog-async-blobstore"),
+      "com.precog" %% "quasar-datasource-blobstore-core" % managedVersions.value("precog-quasar-datasource-azure"),
+      "org.http4s" %% "http4s-async-http-client" % Http4sVersion,
+      "org.slf4s" %% "slf4s-api" % Slf4sVersion),
 
     libraryDependencies ++= Seq(
       "org.specs2" %% "specs2-core" % Specs2Version % Test))

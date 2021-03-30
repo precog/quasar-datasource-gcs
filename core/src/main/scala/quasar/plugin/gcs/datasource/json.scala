@@ -16,13 +16,8 @@
 
 package quasar.plugin.gcs.datasource
 
-import scala.util.Either
+import argonaut.CodecJson
 
-import argonaut.Json
-import quasar.blobstore.gcs.GoogleAuthConfig
-
-final case class GCSConfig(gac: GoogleAuthConfig) {
-    def sanitize: GCSConfig = scala.Predef.???
-    def asJson: Json = scala.Predef.???
-    def reconfigureNonSensitive(c: GCSConfig): Either[GCSConfig, GCSConfig] = scala.Predef.???
+object json {
+  implicit val codecConfig: CodecJson[GCSConfig] = scala.Predef.???
 }

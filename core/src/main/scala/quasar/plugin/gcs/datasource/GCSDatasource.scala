@@ -26,11 +26,15 @@ import quasar.connector.datasource.{BatchLoader, LightweightDatasource, Loader}
 import quasar.qscript.InterpretedRead
 
 import cats.data.NonEmptyList
-import cats.effect.Resource
+import cats.effect.{Concurrent, ConcurrentEffect, Resource}
 
 import fs2.Stream
 
 import org.slf4s.Logging
+import quasar.physical.blobstore.BlobstoreDatasource
+import quasar.blobstore.gcs.GoogleCloudStorage
+import cats.effect.ContextShift
+import org.http4s.client.Client
 
 final class GCSDatasource[F[_]](
     config: GCSConfig)
@@ -50,4 +54,11 @@ final class GCSDatasource[F[_]](
 
   def prefixedChildPaths(prefixPath: ResourcePath)
       : Resource[F, Option[Stream[F,(ResourceName, ResourcePathType.Physical)]]] = ???
+}
+
+object GCSDatasource {
+  def mk[F[_]: Concurrent: ConcurrentEffect: ContextShift](cfg: GCSConfig): F[BlobstoreDatasource[F, Client[F]]] = {
+    val x: Resource[F, Client[F]] = GoogleCloudStorage.mkContainerClient(cfg.gac)
+    x.asInstanceOf[F[BlobstoreDatasource[F, Client[F]]]]
+  }
 }
