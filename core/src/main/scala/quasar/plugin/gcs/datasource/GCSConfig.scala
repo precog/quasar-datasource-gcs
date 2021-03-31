@@ -16,12 +16,20 @@
 
 package quasar.plugin.gcs.datasource
 
-import java.net.URI
-import scala.Boolean
-import scala.util.{Either, Left, Right}
+import scala.{Boolean, StringContext}
+import scala.Predef.String
 
 import quasar.blobstore.gcs.{Bucket, ServiceAccountConfig}
 import quasar.connector.DataFormat
+
+import argonaut._, Argonaut._
+
+import cats.implicits._
+
+import scala.util.{Either, Left, Right}
+
+import java.net.{URI, URISyntaxException}
+
 
 final case class GCSConfig(
     auth: ServiceAccountConfig,
@@ -71,4 +79,67 @@ object GCSConfig {
     clientEmail = "",
     accountType = ""
   )
+
+  implicit val uriCodecJson: CodecJson[URI] =
+    CodecJson(
+      uri => Json.jString(uri.toString),
+      c => for {
+        uriStr <- c.jdecode[String]
+        uri0 = Either.catchOnly[URISyntaxException](new URI(uriStr))
+        uri <- uri0.fold(
+          ex => DecodeResult.fail(s"Invalid URI: ${ex.getMessage}", c.history),
+          DecodeResult.ok(_))
+      } yield uri)
+
+  implicit val serviceAccountConfigCodecJson: CodecJson[ServiceAccountConfig] = 
+    casecodec10[URI,URI, String, String, URI, URI, String, String, String, String, ServiceAccountConfig](
+      (tokenUri,
+      authProviderCertUrl,
+      privateKey,
+      clientId,
+      clientCertUrl,
+      authUri,
+      projectId,
+      privateKeyId,
+      clientEmail,
+      accountType) => ServiceAccountConfig(
+        tokenUri = tokenUri,
+        authProviderCertUrl = authProviderCertUrl,
+        privateKey = privateKey,
+        clientId = clientId,
+        clientCertUrl = clientCertUrl,
+        authUri = authUri,
+        projectId = projectId,
+        privateKeyId = privateKeyId,
+        clientEmail = clientEmail,
+        accountType = accountType),
+      sac => 
+        (sac.tokenUri, 
+        sac.authProviderCertUrl,
+        sac.privateKey,
+        sac.clientId,
+        sac.clientCertUrl,
+        sac.authUri,
+        sac.projectId,
+        sac.privateKeyId,
+        sac.clientEmail,
+        sac.accountType).some)(
+          "token_uri",
+          "auth_provider_x509_cert_url",
+          "private_key",
+          "client_id",
+          "client_x509_cert_url",
+          "auth_uri",
+          "project_id",
+          "private_key_id",
+          "client_email",
+          "type")
+
+  implicit val gbqConfigCodecJson: CodecJson[GCSConfig] =
+    casecodec3[ServiceAccountConfig, Bucket, DataFormat, GCSConfig](
+      (auth, bucket, format) => GCSConfig(auth, bucket, format),
+      gbqc => (gbqc.auth, gbqc.bucket, gbqc.format).some)("auth", "bucket", "format")
+
+  implicit val bucketCodecJson: CodecJson[Bucket] = 
+    casecodec1(Bucket.apply, Bucket.unapply)("value")
 }

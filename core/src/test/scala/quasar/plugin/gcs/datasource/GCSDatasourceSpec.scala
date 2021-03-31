@@ -16,18 +16,46 @@
 
 package quasar.plugin.gcs.datasource
 
+import scala.Predef.String
+
+import quasar.blobstore.gcs.{Bucket, ServiceAccountConfig}
 import quasar.contrib.scalaz.MonadError_
-import quasar.connector.ResourceError
+import quasar.connector.{DataFormat, ResourceError}
 import quasar.connector.datasource.LightweightDatasourceModule
+import quasar.physical.blobstore.BlobstoreDatasourceSpec
+
+import argonaut._, Argonaut._
 
 import cats.effect.{IO, Resource}
-import quasar.physical.blobstore.BlobstoreDatasourceSpec
+
+import org.slf4s.{Logger, LoggerFactory}
+
+import java.nio.file.{Files, Paths}
+import java.nio.charset.StandardCharsets.UTF_8
+
+import scala.util.{Left, Right}
 
 abstract class GCSDatasourceSpec extends BlobstoreDatasourceSpec {
 
+  import GCSConfig.serviceAccountConfigCodecJson
+  import AzureDatasourceSpec.ioMonadResourceErr
+
+  val log: Logger = LoggerFactory("quasar.blobstore.gcs.GCSListServiceSpec")
+
+  val AUTH_FILE="precog-ci-275718-9de94866bc77.json"
+  val bucket = Bucket("bucket-8168b20d-a6f0-427f-a21b-232a2e8742e1")
+  val authCfgPath = Paths.get(getClass.getClassLoader.getResource(AUTH_FILE).toURI)
+  val authCfgString = new String(Files.readAllBytes(authCfgPath), UTF_8)
+  val authCfgJson: Json = Parse.parse(authCfgString) match {
+    case Left(value) => Json.obj("malformed" := true)
+    case Right(value) => value
+  }
+  val format = DataFormat.json
+  val authConfig = authCfgJson.as[ServiceAccountConfig].toOption.get
+  val cfg = GCSConfig(authConfig, bucket, format)
+  
   override def datasource: Resource[IO, LightweightDatasourceModule.DS[IO]] =
-    //Resource.liftF(AzureDatasource.mk[IO](cfg))
-    scala.Predef.???
+    GCSDatasource.mk[IO](log, cfg)
 }
 
 object AzureDatasourceSpec {
