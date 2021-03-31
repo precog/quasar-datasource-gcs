@@ -41,6 +41,6 @@ object GCSDatasource {
           GCSStatusService[F](client, cfg.bucket, GoogleAuthConfig(cfg.auth)),
           GCSListService[F](log, client, cfg.bucket),
           GCSPropsService.mk[F](log, client, cfg.bucket),
-          GCSGetService.mk[F](client, cfg.bucket, GoogleAuthConfig(cfg.auth)))
+          GCSGetService.mk[F](log, client, cfg.bucket))
   }
 }
