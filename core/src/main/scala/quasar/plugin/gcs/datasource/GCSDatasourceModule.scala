@@ -32,7 +32,7 @@ import quasar.connector.{ByteStore, MonadResourceErr, ExternalCredentials}
 import quasar.connector.datasource.Reconfiguration
 import quasar.plugin.gcs.datasource.json._
 
-import argonaut.Json
+import argonaut._, Argonaut._
 import cats.ApplicativeError
 import cats.effect.{ConcurrentEffect, ContextShift, Resource, Sync, Timer}
 import cats.kernel.Hash

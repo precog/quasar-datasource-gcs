@@ -16,14 +16,59 @@
 
 package quasar.plugin.gcs.datasource
 
-import scala.util.Either
+import java.net.URI
+import scala.Boolean
+import scala.util.{Either, Left, Right}
 
-import argonaut.Json
-import quasar.blobstore.gcs.{Bucket, GoogleAuthConfig}
+import quasar.blobstore.gcs.{Bucket, ServiceAccountConfig}
 import quasar.connector.DataFormat
 
-final case class GCSConfig(gac: GoogleAuthConfig, bucket: Bucket, format: DataFormat) {
-    def sanitize: GCSConfig = scala.Predef.???
-    def asJson: Json = scala.Predef.???
-    def reconfigureNonSensitive(c: GCSConfig): Either[GCSConfig, GCSConfig] = scala.Predef.???
+final case class GCSConfig(
+    auth: ServiceAccountConfig,
+    bucket: Bucket,
+    format: DataFormat) {
+
+  import GCSConfig._
+
+  def sanitize: GCSConfig = copy(auth = SanitizedAuth)
+
+  def isSensitive: Boolean = auth != EmptyAuth
+
+  def reconfigureNonSensitive(patch: GCSConfig): Either[GCSConfig, GCSConfig] =
+    if (patch.isSensitive)
+      Left(patch.sanitize)
+    else
+      Right(copy(bucket = patch.bucket, format = patch.format))
+}
+
+object GCSConfig {
+  val Redacted = "<REDACTED>"
+  val RedactedUri = URI.create("REDACTED")
+  val EmptyUri = URI.create("")
+
+  val SanitizedAuth: ServiceAccountConfig = ServiceAccountConfig(
+    tokenUri = RedactedUri,
+    authProviderCertUrl = RedactedUri,
+    clientCertUrl = RedactedUri,
+    authUri = RedactedUri,
+    privateKey = Redacted,
+    clientId = Redacted,
+    projectId = Redacted,
+    privateKeyId = Redacted,
+    clientEmail = Redacted,
+    accountType = Redacted
+  )
+
+  val EmptyAuth: ServiceAccountConfig = ServiceAccountConfig(
+    tokenUri = EmptyUri,
+    authProviderCertUrl = EmptyUri,
+    clientCertUrl = EmptyUri,
+    authUri = EmptyUri,
+    privateKey = "",
+    clientId = "",
+    projectId = "",
+    privateKeyId = "",
+    clientEmail = "",
+    accountType = ""
+  )
 }

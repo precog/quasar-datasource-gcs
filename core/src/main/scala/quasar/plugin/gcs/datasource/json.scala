@@ -16,8 +16,15 @@
 
 package quasar.plugin.gcs.datasource
 
-import argonaut.CodecJson
+import quasar.blobstore.gcs.{Bucket, GoogleAuthConfig}, GoogleAuthConfig._
+
+import argonaut._, Argonaut._
 
 object json {
-  implicit val codecConfig: CodecJson[GCSConfig] = scala.Predef.???
+
+  implicit val codecBucket: CodecJson[Bucket] =
+    CodecJson(_.value.asJson, jdecode1(Bucket(_)).decode)
+
+  implicit val codecConfig: CodecJson[GCSConfig] =
+    casecodec3(GCSConfig.apply, GCSConfig.unapply)("auth", "bucket", "format")
 }

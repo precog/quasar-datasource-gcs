@@ -17,12 +17,11 @@
 package quasar.plugin.gcs.datasource
 
 import quasar.api.datasource.DatasourceType
-import quasar.blobstore.gcs.{GCSGetService, GCSListService, GCSStatusService, GoogleCloudStorage}
+import quasar.blobstore.gcs.{GCSFileProperties, GCSGetService, GCSListService, GCSPropsService, GCSStatusService, GoogleAuthConfig, GoogleCloudStorage}, GCSFileProperties._
 import quasar.connector.MonadResourceErr
 import quasar.physical.blobstore.BlobstoreDatasource
 
 import cats.effect.{Concurrent, ConcurrentEffect, ContextShift, Resource, Timer}
-import org.http4s.client.Client
 import org.slf4s.Logger
 
 object GCSDatasource {
@@ -31,17 +30,17 @@ object GCSDatasource {
   def mk[F[_]: Concurrent: ConcurrentEffect: ContextShift: MonadResourceErr: Timer](
       log: Logger,
       cfg: GCSConfig)
-      : Resource[F, BlobstoreDatasource[F, Client[F]]] = {
+      : Resource[F, BlobstoreDatasource[F, GCSFileProperties]] = {
 
     for {
-      client <- GoogleCloudStorage.mkContainerClient(cfg.gac)
+      client <- GoogleCloudStorage.mkContainerClient(GoogleAuthConfig(cfg.auth))
     } yield
-        BlobstoreDatasource[F, Client[F]](
-          dsType, 
+        BlobstoreDatasource[F, GCSFileProperties](
+          dsType,
           cfg.format,
-          GCSStatusService[F](client, cfg.bucket, cfg.gac),
+          GCSStatusService[F](client, cfg.bucket, GoogleAuthConfig(cfg.auth)),
           GCSListService[F](log, client, cfg.bucket),
-          scala.Predef.???,
-          GCSGetService.mk[F](client, cfg.bucket, cfg.gac))
+          GCSPropsService.mk[F](log, client, cfg.bucket),
+          GCSGetService.mk[F](client, cfg.bucket, GoogleAuthConfig(cfg.auth)))
   }
 }
