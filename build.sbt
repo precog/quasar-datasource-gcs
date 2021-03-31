@@ -49,6 +49,7 @@ lazy val core = project
       "org.slf4s" %% "slf4s-api" % Slf4sVersion),
 
     libraryDependencies ++= Seq(
+      "com.precog" %% "quasar-datasource-blobstore-core" % managedVersions.value("precog-quasar-datasource-azure") % "test->test" classifier "tests",
       "org.specs2" %% "specs2-core" % Specs2Version % Test))
 
   .enablePlugins(QuasarPlugin)
