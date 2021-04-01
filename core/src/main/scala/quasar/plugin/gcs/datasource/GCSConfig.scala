@@ -16,12 +16,13 @@
 
 package quasar.plugin.gcs.datasource
 
-import java.net.URI
 import scala.Boolean
-import scala.util.{Either, Left, Right}
-
 import quasar.blobstore.gcs.{Bucket, ServiceAccountConfig}
 import quasar.connector.DataFormat
+
+import scala.util.{Either, Left, Right}
+
+import java.net.URI
 
 final case class GCSConfig(
     auth: ServiceAccountConfig,
@@ -70,5 +71,18 @@ object GCSConfig {
     privateKeyId = "",
     clientEmail = "",
     accountType = ""
+  )
+
+  val BogusAuth: ServiceAccountConfig = ServiceAccountConfig(
+    tokenUri = URI.create("https://oauth2.googleapis.com/token"),
+    authProviderCertUrl = URI.create("https://www.googleapis.com/oauth2/v1/certs"),
+    clientCertUrl = URI.create("https://www.googleapis.com/robot/v1/metadata/x509/read-bucket-sa%40project-name.iam.gserviceaccount.com"),
+    authUri = URI.create("https://accounts.google.com/o/oauth2/auth"),
+    privateKey = "1234567890",
+    clientId = "1234567890",
+    projectId = "project-name",
+    privateKeyId = "1234567890",
+    clientEmail = "read-bucket-sa@project-name.iam.gserviceaccount.com",
+    accountType = "service-account"
   )
 }

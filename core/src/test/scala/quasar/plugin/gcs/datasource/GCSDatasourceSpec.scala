@@ -16,18 +16,28 @@
 
 package quasar.plugin.gcs.datasource
 
+import quasar.blobstore.gcs.Bucket
 import quasar.contrib.scalaz.MonadError_
 import quasar.connector.ResourceError
 import quasar.connector.datasource.LightweightDatasourceModule
+import quasar.physical.blobstore.BlobstoreDatasourceSpec
 
 import cats.effect.{IO, Resource}
-import quasar.physical.blobstore.BlobstoreDatasourceSpec
+
+import org.slf4s.{Logger, LoggerFactory}
 
 abstract class GCSDatasourceSpec extends BlobstoreDatasourceSpec {
 
+  import AzureDatasourceSpec.ioMonadResourceErr
+
+  val log: Logger = LoggerFactory("quasar.blobstore.gcs.GCSListServiceSpec")
+
+  val cfg = common.getGCSConfig(
+    "precog-ci-275718-9de94866bc77.json",
+    Bucket("bucket-8168b20d-a6f0-427f-a21b-232a2e8742e1"))
+  
   override def datasource: Resource[IO, LightweightDatasourceModule.DS[IO]] =
-    //Resource.liftF(AzureDatasource.mk[IO](cfg))
-    scala.Predef.???
+    GCSDatasource.mk[IO](log, cfg)
 }
 
 object AzureDatasourceSpec {
