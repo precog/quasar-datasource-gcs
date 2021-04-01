@@ -24,14 +24,10 @@ import scala.Predef.String
 import argonaut._, Argonaut._
 
 import cats.implicits._
-import cats.effect.implicits._
-
-import org.http4s.argonaut._
 
 import scala.util.Either
 
 import java.net.{URI, URISyntaxException}
-import quasar.connector.DataFormat
 
 object json {
 
