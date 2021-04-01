@@ -52,13 +52,11 @@ class GCSDatasourceModuleSpec extends Specification {
       .use(r => IO.pure(r.void)))
     .unsafeRunSync()
 
+  val validBucket = Bucket("bucket-8168b20d-a6f0-427f-a21b-232a2e8742e1")
+
   val gcsConfigJson = common.getGCSConfigAsJson(
     "precog-ci-275718-9de94866bc77.json",
-    Bucket("bucket-8168b20d-a6f0-427f-a21b-232a2e8742e1"))
-
-  val badGCSConfigJson = common.getGCSConfigAsJson(
-    "bad-auth-file.json",
-    Bucket("bucket-8168b20d-a6f0-427f-a21b-232a2e8742e1"))
+    validBucket)
 
   val gcsConfigJsonWithInvalidBucket = common.getGCSConfigAsJson(
     "precog-ci-275718-9de94866bc77.json",
@@ -96,7 +94,7 @@ class GCSDatasourceModuleSpec extends Specification {
     "redacts config with credentials" >> {
       val saCfgJson = common.getGCSConfigFromSAConfigAsJson(
         GCSConfig.SanitizedAuth,
-        Bucket("bucket-8168b20d-a6f0-427f-a21b-232a2e8742e1"))
+        validBucket)
 
       GCSDatasourceModule.sanitizeConfig(gcsConfigJson) must_=== saCfgJson
     }
