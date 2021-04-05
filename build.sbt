@@ -9,6 +9,11 @@ ThisBuild / scmInfo := Some(ScmInfo(
   url("https://github.com/precog/quasar-datasource-gcs"),
   "scm:git@github.com:precog/quasar-datasource-gcs.git"))
 
+ThisBuild / githubWorkflowBuildPreamble +=
+  WorkflowStep.Sbt(
+    List("decryptSecret gcs/src/test/resources/precog-ci-275718-9de94866bc77.json.enc"),
+    name = Some("Decrypt gcp service account json key"))
+
 ThisBuild / publishAsOSSProject := true
 
 // Include to also publish a project's tests
