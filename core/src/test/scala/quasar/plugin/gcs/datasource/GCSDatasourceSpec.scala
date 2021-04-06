@@ -26,7 +26,7 @@ import cats.effect.{IO, Resource}
 
 import org.slf4s.{Logger, LoggerFactory}
 
-abstract class GCSDatasourceSpec extends BlobstoreDatasourceSpec {
+class GCSDatasourceSpec extends BlobstoreDatasourceSpec {
 
   import AzureDatasourceSpec.ioMonadResourceErr
 
@@ -34,7 +34,7 @@ abstract class GCSDatasourceSpec extends BlobstoreDatasourceSpec {
 
   val cfg = common.getGCSConfig(
     "precog-ci-275718-9de94866bc77.json",
-    Bucket("bucket-8168b20d-a6f0-427f-a21b-232a2e8742e1"))
+    Bucket("precog-test-bucket"))
   
   override def datasource: Resource[IO, LightweightDatasourceModule.DS[IO]] =
     GCSDatasource.mk[IO](log, cfg)
