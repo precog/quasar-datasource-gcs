@@ -36,7 +36,7 @@ import java.util.UUID
 
 class GCSDatasourceModuleSpec extends Specification {
 
-  import AzureDatasourceSpec._
+  import GCSDatasourceSpec._
   import json._
 
   implicit val ec: ExecutionContext = ExecutionContext.global

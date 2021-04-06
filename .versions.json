@@ -1,5 +1,5 @@
 {
   "precog-quasar": "204.0.0",
   "precog-quasar-datasource-azure": "29.0.0-b734ff0",
-  "precog-async-blobstore": "5.0.0-32e835e"
+  "precog-async-blobstore": "5.0.0-490694d"
 }

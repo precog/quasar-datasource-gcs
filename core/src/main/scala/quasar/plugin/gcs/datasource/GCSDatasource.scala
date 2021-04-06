@@ -17,7 +17,7 @@
 package quasar.plugin.gcs.datasource
 
 import quasar.api.datasource.DatasourceType
-import quasar.blobstore.gcs.{GCSFileProperties, GCSGetService, GCSListService, GCSPropsService, GCSStatusService, GoogleAuthConfig, GoogleCloudStorage}, GCSFileProperties._
+import quasar.blobstore.gcs.{GCSFileProperties, GCSGetService, GCSListService, GCSPropsService, GCSStatusService, GoogleCloudStorage}, GCSFileProperties._
 import quasar.connector.MonadResourceErr
 import quasar.physical.blobstore.BlobstoreDatasource
 
@@ -33,12 +33,12 @@ object GCSDatasource {
       : Resource[F, BlobstoreDatasource[F, GCSFileProperties]] = {
 
     for {
-      client <- GoogleCloudStorage.mkContainerClient(GoogleAuthConfig(cfg.auth))
+      client <- GoogleCloudStorage.mkContainerClient(cfg.auth)
     } yield
         BlobstoreDatasource[F, GCSFileProperties](
           dsType,
           cfg.format,
-          GCSStatusService[F](client, cfg.bucket, GoogleAuthConfig(cfg.auth)),
+          GCSStatusService[F](client, cfg.bucket, cfg.auth),
           GCSListService[F](log, client, cfg.bucket),
           GCSPropsService.mk[F](log, client, cfg.bucket),
           GCSGetService.mk[F](log, client, cfg.bucket))

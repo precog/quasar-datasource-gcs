@@ -28,19 +28,19 @@ import org.slf4s.{Logger, LoggerFactory}
 
 class GCSDatasourceSpec extends BlobstoreDatasourceSpec {
 
-  import AzureDatasourceSpec.ioMonadResourceErr
+  import GCSDatasourceSpec._
 
   val log: Logger = LoggerFactory("quasar.blobstore.gcs.GCSListServiceSpec")
 
   val cfg = common.getGCSConfig(
     "precog-ci-275718-9de94866bc77.json",
     Bucket("precog-test-bucket"))
-  
+
   override def datasource: Resource[IO, LightweightDatasourceModule.DS[IO]] =
     GCSDatasource.mk[IO](log, cfg)
 }
 
-object AzureDatasourceSpec {
+object GCSDatasourceSpec {
 
   implicit val ioMonadResourceErr: MonadError_[IO, ResourceError] =
     MonadError_.facet[IO](ResourceError.throwableP)
