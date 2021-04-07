@@ -60,10 +60,10 @@ jobs:
         run: $SBT ++${{ matrix.scala }} transferCommonResources exportSecretsForActions
 
       - name: Decrypt gcp service account json key
-        run: $SBT ++${{ matrix.scala }} 'decryptSecret gcs/src/test/resources/precog-ci-275718-9de94866bc77.json.enc'
+        run: $SBT ++${{ matrix.scala }} 'decryptSecret core/src/test/resources/precog-ci-275718-9de94866bc77.json.enc'
 
       - name: Decrypt bad gcp service account json key
-        run: $SBT ++${{ matrix.scala }} 'decryptSecret gcs/src/test/resources/bad-auth-file.json.enc'
+        run: $SBT ++${{ matrix.scala }} 'decryptSecret core/src/test/resources/bad-auth-file.json.enc'
 
       - name: Check that workflows are up to date
         run: $SBT ++${{ matrix.scala }} githubWorkflowCheck
@@ -71,7 +71,7 @@ jobs:
       - run: $SBT ++${{ matrix.scala }} ci
 
       - name: Compress target directories
-        run: tar cf targets.tar target core/target project/target
+        run: tar cf targets.tar target core/target ../async-blobstore/s3/target ../async-blobstore/gcs/target ../async-blobstore/target ../async-blobstore/azure/target ../async-blobstore/core/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2
