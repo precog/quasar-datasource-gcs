@@ -17,10 +17,12 @@
 package quasar.plugin.gcs.datasource
 
 import scala.None
+import scala.Left
 
 import quasar.{RateLimiter, NoopRateLimitUpdater}
 import quasar.blobstore.gcs.Bucket
 import quasar.connector.ByteStore
+import quasar.api.datasource.DatasourceError
 
 import argonaut._
 
@@ -58,6 +60,10 @@ class GCSDatasourceModuleSpec extends Specification {
     "precog-ci-275718-9de94866bc77.json",
     validBucket)
 
+  val badGCSConfigJson = common.getGCSConfigAsJson(
+    "bad-auth-file.json",
+    validBucket)
+
   val gcsConfigJsonWithInvalidBucket = common.getGCSConfigAsJson(
     "precog-ci-275718-9de94866bc77.json",
     Bucket("bad-bucket"))
@@ -72,22 +78,17 @@ class GCSDatasourceModuleSpec extends Specification {
       init(gcsConfigJson) must beRight
     }
 
-    //TODO: make GCSAccessToken handle wrong configs in async-blobstore
+    "access denied with invalid auth file" >> {
+      init(badGCSConfigJson) must beLike {
+        case Left(DatasourceError.AccessDenied(_, _, _)) => ok
+      }
+    }
 
-    // "access denied with invalid auth file" >> {
-    //   init(badGCSConfigJson) must beLike {
-    //     case Left(DatasourceError.AccessDenied(_, _, _)) => ok
-    //   }
-    // }
-
-    //TODO: GCSGetService returns empty stream when no bucket is present
-    // so this fails since we get a Right(())
-
-    // "invalid config when config is valid and bucket is invalid" >> {
-    //   init(gcsConfigJsonWithInvalidBucket) must beLike {
-    //     case Left(DatasourceError.InvalidConfiguration(_, _, _)) => ok
-    //   }
-    // }
+    "access denied with valid config and invalid bucket " >> {
+      init(gcsConfigJsonWithInvalidBucket) must beLike {
+        case Left(DatasourceError.AccessDenied(_, _, _)) => ok
+      }
+    }
   }
 
   "sanitize config" >> {
