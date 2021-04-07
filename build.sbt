@@ -11,12 +11,12 @@ ThisBuild / scmInfo := Some(ScmInfo(
 
 ThisBuild / githubWorkflowBuildPreamble +=
   WorkflowStep.Sbt(
-    List("decryptSecret gcs/src/test/resources/precog-ci-275718-9de94866bc77.json.enc"),
+    List("decryptSecret core/src/test/resources/precog-ci-275718-9de94866bc77.json.enc"),
     name = Some("Decrypt gcp service account json key"))
 
 ThisBuild / githubWorkflowBuildPreamble +=
   WorkflowStep.Sbt(
-    List("decryptSecret gcs/src/test/resources/bad-auth-file.json.enc"),
+    List("decryptSecret core/src/test/resources/bad-auth-file.json.enc"),
     name = Some("Decrypt bad gcp service account json key"))
 
 ThisBuild / publishAsOSSProject := true
