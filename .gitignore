@@ -11,5 +11,5 @@ target/
 /scripts/readVersion
 *.swp
 *.swo
-/core/src/test/resources/precog-ci-275718-087094ee66ba.json
+/core/src/test/resources/bad-auth-file.json
 /core/src/test/resources/precog-ci-275718-9de94866bc77.json

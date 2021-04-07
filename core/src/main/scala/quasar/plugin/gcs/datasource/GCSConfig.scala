@@ -70,17 +70,4 @@ object GCSConfig {
     clientEmail = "",
     accountType = ""
   )
-
-  val BogusAuth: ServiceAccountConfig = ServiceAccountConfig(
-    tokenUri = Url("https://oauth2.googleapis.com/token"),
-    authProviderCertUrl = Url("https://www.googleapis.com/oauth2/v1/certs"),
-    clientCertUrl = Url("https://www.googleapis.com/robot/v1/metadata/x509/read-bucket-sa%40project-name.iam.gserviceaccount.com"),
-    authUri = Url("https://accounts.google.com/o/oauth2/auth"),
-    privateKey = "1234567890",
-    clientId = "1234567890",
-    projectId = "project-name",
-    privateKeyId = "1234567890",
-    clientEmail = "read-bucket-sa@project-name.iam.gserviceaccount.com",
-    accountType = "service-account"
-  )
 }
