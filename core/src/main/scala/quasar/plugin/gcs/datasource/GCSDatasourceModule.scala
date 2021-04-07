@@ -22,7 +22,6 @@ import java.net.{MalformedURLException, UnknownHostException}
 import java.util.UUID
 
 import scala._
-import scala.Predef.println
 import scala.concurrent.ExecutionContext
 import scala.util.control.NonFatal
 
@@ -54,8 +53,6 @@ object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
        : Resource[F, Either[InitializationError[Json], LightweightDatasourceModule.DS[F]]] = {
 
     val sanitizedJson = sanitizeConfig(json)
-
-    println("json config: "  + json.as[GCSConfig].result)
 
     json.as[GCSConfig].result match {
       case Right(cfg) =>
