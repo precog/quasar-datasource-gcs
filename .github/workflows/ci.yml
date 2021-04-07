@@ -71,7 +71,7 @@ jobs:
       - run: $SBT ++${{ matrix.scala }} ci
 
       - name: Compress target directories
-        run: tar cf targets.tar target core/target ../async-blobstore/s3/target ../async-blobstore/gcs/target ../async-blobstore/target ../async-blobstore/azure/target ../async-blobstore/core/target project/target
+        run: tar cf targets.tar target core/target ../async-blobstore/s3/target ../async-blobstore/gcs/target ../async-blobstore/target ../async-blobstore/azure/target ../async-blobstore/core/target ../../../tmp/quasar-lib-blobstore/target ../../../tmp/quasar-lib-blobstore/core/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2
