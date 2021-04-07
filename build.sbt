@@ -54,12 +54,12 @@ lazy val core = project
     // libraryDependencies.
     quasarPluginDependencies ++= Seq(
       "com.precog" %% "async-blobstore-gcs" % managedVersions.value("precog-async-blobstore"),
-      "com.precog" %% "quasar-datasource-blobstore-core" % managedVersions.value("precog-quasar-datasource-azure"),
+      "com.precog" %% "quasar-lib-blobstore" % managedVersions.value("precog-quasar-lib-blobstore"),
       "org.http4s" %% "http4s-async-http-client" % Http4sVersion,
       "org.slf4s" %% "slf4s-api" % Slf4sVersion),
 
     libraryDependencies ++= Seq(
-      "com.precog" %% "quasar-datasource-blobstore-core" % managedVersions.value("precog-quasar-datasource-azure") % "test->test" classifier "tests",
+      "com.precog" %% "quasar-lib-blobstore" % managedVersions.value("precog-quasar-lib-blobstore") % "test->test" classifier "tests",
       "org.specs2" %% "specs2-core" % Specs2Version % Test))
 
   .enablePlugins(QuasarPlugin)

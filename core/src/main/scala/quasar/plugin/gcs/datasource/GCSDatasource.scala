@@ -38,7 +38,7 @@ object GCSDatasource {
         BlobstoreDatasource[F, GCSFileProperties](
           dsType,
           cfg.format,
-          GCSStatusService[F](client, cfg.bucket, cfg.auth),
+          GCSStatusService[F](log, client, cfg.bucket),
           GCSListService[F](log, client, cfg.bucket),
           GCSPropsService.mk[F](log, client, cfg.bucket),
           GCSGetService.mk[F](log, client, cfg.bucket))
