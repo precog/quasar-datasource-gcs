@@ -16,38 +16,31 @@
 
 package quasar.plugin.gcs.datasource
 
-import scala._
-import scala.Predef._
-
 import quasar.api.datasource.DatasourceType
-import quasar.api.resource.{ResourceName, ResourcePath, ResourcePathType}
-import quasar.connector.QueryResult
-import quasar.connector.datasource.{BatchLoader, LightweightDatasource, Loader}
-import quasar.qscript.InterpretedRead
+import quasar.blobstore.gcs.{GCSFileProperties, GCSGetService, GCSListService, GCSPropsService, GCSStatusService, GoogleCloudStorage}, GCSFileProperties._
+import quasar.connector.MonadResourceErr
+import quasar.physical.blobstore.BlobstoreDatasource
 
-import cats.data.NonEmptyList
-import cats.effect.Resource
+import cats.effect.{Concurrent, ConcurrentEffect, ContextShift, Resource, Timer}
+import org.slf4s.Logger
 
-import fs2.Stream
+object GCSDatasource {
+  val dsType: DatasourceType = DatasourceType("gcs", 1L)
 
-import org.slf4s.Logging
+  def mk[F[_]: Concurrent: ConcurrentEffect: ContextShift: MonadResourceErr: Timer](
+      log: Logger,
+      cfg: GCSConfig)
+      : Resource[F, BlobstoreDatasource[F, GCSFileProperties]] = {
 
-final class GCSDatasource[F[_]](
-    config: GCSConfig)
-    extends LightweightDatasource[Resource[F, ?], Stream[F, ?], QueryResult[F]]
-    with Logging {
-
-  val kind: DatasourceType = GCSDatasourceModule.kind
-
-  val loaders: NonEmptyList[Loader[Resource[F, ?], InterpretedRead[ResourcePath], QueryResult[F]]] = {
-    val loader: Loader[Resource[F, ?], InterpretedRead[ResourcePath], QueryResult[F]] =
-      Loader.Batch(BatchLoader.Full(q => ???))
-
-    NonEmptyList.one(loader)
+    for {
+      client <- GoogleCloudStorage.mkContainerClient(cfg.auth)
+    } yield
+        BlobstoreDatasource[F, GCSFileProperties](
+          dsType,
+          cfg.format,
+          GCSStatusService[F](log, client, cfg.bucket),
+          GCSListService[F](log, client, cfg.bucket),
+          GCSPropsService.mk[F](log, client, cfg.bucket),
+          GCSGetService.mk[F](log, client, cfg.bucket))
   }
-
-  def pathIsResource(path: ResourcePath): Resource[F, Boolean] = ???
-
-  def prefixedChildPaths(prefixPath: ResourcePath)
-      : Resource[F, Option[Stream[F,(ResourceName, ResourcePathType.Physical)]]] = ???
 }
