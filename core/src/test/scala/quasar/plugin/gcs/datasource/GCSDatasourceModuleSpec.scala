@@ -19,7 +19,7 @@ package quasar.plugin.gcs.datasource
 import scala.None
 import scala.Left
 
-import quasar.{RateLimiter, NoopRateLimitUpdater}
+import quasar.RateLimiter
 import quasar.blobstore.gcs.Bucket
 import quasar.connector.ByteStore
 import quasar.api.datasource.DatasourceError
@@ -46,12 +46,11 @@ class GCSDatasourceModuleSpec extends Specification {
   implicit val timer: Timer[IO] = IO.timer(ec)
 
   def init(j: Json) =
-    RateLimiter[IO, UUID](
-      1.0, IO.delay(UUID.randomUUID()), NoopRateLimitUpdater[IO, UUID])
+    RateLimiter[IO, UUID](IO.delay(UUID.randomUUID()))
     .flatMap(rl =>
       GCSDatasourceModule.lightweightDatasource[IO, UUID](
-        j, rl, ByteStore.void[IO], _ => IO(None))
-      .use(r => IO.pure(r.void)))
+        j, rl, ByteStore.void[IO], _ => IO(None)))
+    .use(r => IO.pure(r.void))
     .unsafeRunSync()
 
   val validBucket = Bucket("bucket-8168b20d-a6f0-427f-a21b-232a2e8742e1")
