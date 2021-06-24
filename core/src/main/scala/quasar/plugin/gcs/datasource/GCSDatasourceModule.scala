@@ -58,7 +58,7 @@ object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
       case Right(cfg) =>
         val r = for {
           ds <- GCSDatasource.mk(log, cfg)
-          l <- Resource.liftF(ds.status)
+          l <- Resource.eval(ds.status)
           res = l match {
             case BlobstoreStatus.Ok =>
               Right(ds.asDsType)
