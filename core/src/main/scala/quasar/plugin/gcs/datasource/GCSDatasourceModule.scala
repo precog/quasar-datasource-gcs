@@ -16,7 +16,7 @@
 
 package quasar.plugin.gcs.datasource
 
-import quasar.connector.datasource.LightweightDatasourceModule
+import quasar.connector.datasource.DatasourceModule
 
 import java.util.UUID
 
@@ -37,17 +37,17 @@ import cats.kernel.Hash
 
 import org.slf4s.Logging
 
-object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
+object GCSDatasourceModule extends DatasourceModule with Logging {
 
    val kind: DatasourceType = DatasourceType("gcs", 1L)
 
-   def lightweightDatasource[F[_]: ConcurrentEffect: ContextShift: MonadResourceErr: Timer, A: Hash](
+   def datasource[F[_]: ConcurrentEffect: ContextShift: MonadResourceErr: Timer, A: Hash](
        config: Json,
        rateLimiting: RateLimiting[F, A],
        byteStore: ByteStore[F],
        getAuth: UUID => F[Option[ExternalCredentials[F]]])(
        implicit ec: ExecutionContext)
-       : Resource[F, Either[InitializationError[Json], LightweightDatasourceModule.DS[F]]] = ???
+       : Resource[F, Either[InitializationError[Json], DatasourceModule.DS[F]]] = ???
 
    def reconfigure(original: Json, patch: Json)
        : Either[ConfigurationError[Json], (Reconfiguration, Json)] = ???

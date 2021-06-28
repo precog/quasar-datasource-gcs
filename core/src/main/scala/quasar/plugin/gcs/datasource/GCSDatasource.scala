@@ -22,7 +22,7 @@ import scala.Predef._
 import quasar.api.datasource.DatasourceType
 import quasar.api.resource.{ResourceName, ResourcePath, ResourcePathType}
 import quasar.connector.QueryResult
-import quasar.connector.datasource.{BatchLoader, LightweightDatasource, Loader}
+import quasar.connector.datasource.{BatchLoader, DatasourceModule, Loader}
 import quasar.qscript.InterpretedRead
 
 import cats.data.NonEmptyList
@@ -34,7 +34,7 @@ import org.slf4s.Logging
 
 final class GCSDatasource[F[_]](
     config: GCSConfig)
-    extends LightweightDatasource[Resource[F, ?], Stream[F, ?], QueryResult[F]]
+    extends DatasourceModule.DS[F]
     with Logging {
 
   val kind: DatasourceType = GCSDatasourceModule.kind
