@@ -16,4 +16,58 @@
 
 package quasar.plugin.gcs.datasource
 
-sealed trait GCSConfig
+import scala.Boolean
+import quasar.blobstore.gcs.{Bucket, ServiceAccountConfig, Url}
+import quasar.connector.DataFormat
+
+import scala.util.{Either, Left, Right}
+
+final case class GCSConfig(
+    auth: ServiceAccountConfig,
+    bucket: Bucket,
+    format: DataFormat) {
+
+  import GCSConfig._
+
+  def sanitize: GCSConfig = copy(auth = SanitizedAuth)
+
+  def isSensitive: Boolean = auth != EmptyAuth
+
+  def reconfigureNonSensitive(patch: GCSConfig): Either[GCSConfig, GCSConfig] =
+    if (patch.isSensitive)
+      Left(patch.sanitize)
+    else
+      Right(copy(bucket = patch.bucket, format = patch.format))
+}
+
+object GCSConfig {
+  val Redacted = "<REDACTED>"
+  val RedactedUri = Url("REDACTED")
+  val EmptyUri = Url("")
+
+  val SanitizedAuth: ServiceAccountConfig = ServiceAccountConfig(
+    tokenUri = RedactedUri,
+    authProviderCertUrl = RedactedUri,
+    clientCertUrl = RedactedUri,
+    authUri = RedactedUri,
+    privateKey = Redacted,
+    clientId = Redacted,
+    projectId = Redacted,
+    privateKeyId = Redacted,
+    clientEmail = Redacted,
+    accountType = Redacted
+  )
+
+  val EmptyAuth: ServiceAccountConfig = ServiceAccountConfig(
+    tokenUri = EmptyUri,
+    authProviderCertUrl = EmptyUri,
+    clientCertUrl = EmptyUri,
+    authUri = EmptyUri,
+    privateKey = "",
+    clientId = "",
+    projectId = "",
+    privateKeyId = "",
+    clientEmail = "",
+    accountType = ""
+  )
+}

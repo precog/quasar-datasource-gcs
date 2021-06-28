@@ -20,7 +20,7 @@ env:
   REPO_SLUG: ${{ github.repository }}
   ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
   GITHUB_ACTOR: precog-bot
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.PRECOG_GITHUB_TOKEN }}
 
 jobs:
   build:
@@ -59,6 +59,12 @@ jobs:
         if: env.ENCRYPTION_PASSWORD != null
         run: $SBT ++${{ matrix.scala }} transferCommonResources exportSecretsForActions
 
+      - name: Decrypt gcp service account json key
+        run: $SBT ++${{ matrix.scala }} 'decryptSecret core/src/test/resources/precog-ci-275718-9de94866bc77.json.enc'
+
+      - name: Decrypt bad gcp service account json key
+        run: $SBT ++${{ matrix.scala }} 'decryptSecret core/src/test/resources/bad-auth-file.json.enc'
+
       - name: Check that workflows are up to date
         run: $SBT ++${{ matrix.scala }} githubWorkflowCheck
 
@@ -76,7 +82,7 @@ jobs:
   publish:
     name: Publish Artifacts
     needs: [build]
-    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/backport/v'))
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/backport/v') || github.ref == 'refs/heads/master')
     strategy:
       matrix:
         os: [ubuntu-latest]
