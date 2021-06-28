@@ -48,7 +48,7 @@ class GCSDatasourceModuleSpec extends Specification {
   def init(j: Json) =
     RateLimiter[IO, UUID](IO.delay(UUID.randomUUID()))
     .flatMap(rl =>
-      GCSDatasourceModule.lightweightDatasource[IO, UUID](
+      GCSDatasourceModule.datasource[IO, UUID](
         j, rl, ByteStore.void[IO], _ => IO(None)))
     .use(r => IO.pure(r.void))
     .unsafeRunSync()

@@ -16,7 +16,7 @@
 
 package quasar.plugin.gcs.datasource
 
-import quasar.connector.datasource.LightweightDatasourceModule
+import quasar.connector.datasource.DatasourceModule
 
 import java.net.{MalformedURLException, UnknownHostException}
 import java.util.UUID
@@ -40,17 +40,17 @@ import cats.implicits._
 import org.slf4s.Logging
 import scalaz.NonEmptyList
 
-object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
+object GCSDatasourceModule extends DatasourceModule with Logging {
 
    val kind: DatasourceType = DatasourceType("gcs", 1L)
 
-   def lightweightDatasource[F[_]: ConcurrentEffect: ContextShift: MonadResourceErr: Timer, A: Hash](
+   def datasource[F[_]: ConcurrentEffect: ContextShift: MonadResourceErr: Timer, A: Hash](
        json: Json,
        rateLimiting: RateLimiting[F, A],
        byteStore: ByteStore[F],
        getAuth: UUID => F[Option[ExternalCredentials[F]]])(
        implicit ec: ExecutionContext)
-       : Resource[F, Either[InitializationError[Json], LightweightDatasourceModule.DS[F]]] = {
+       : Resource[F, Either[InitializationError[Json], DatasourceModule.DS[F]]] = {
 
     val sanitizedJson = sanitizeConfig(json)
 
@@ -94,7 +94,7 @@ object GCSDatasourceModule extends LightweightDatasourceModule with Logging {
       case Left((msg, _)) =>
         DatasourceError
           .invalidConfiguration[Json, InitializationError[Json]](kind, sanitizedJson, NonEmptyList(msg))
-          .asLeft[LightweightDatasourceModule.DS[F]]
+          .asLeft[DatasourceModule.DS[F]]
           .pure[Resource[F, ?]]
     }
   }

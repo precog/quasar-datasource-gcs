@@ -64,7 +64,7 @@ lazy val core = project
 
   .enablePlugins(QuasarPlugin)
   .evictToLocal("QUASAR_PATH", "connector", true)
-  //.evictToLocal("QUASAR_LIB_BLOBSTORE_PATH", "core", true)
+  .evictToLocal("QUASAR_LIB_BLOBSTORE_PATH", "core", true)
   //.evictToLocal("ASYNC_BLOBSTORE_PATH", "core", true)
   //.evictToLocal("ASYNC_BLOBSTORE_PATH", "gcs", true)
 

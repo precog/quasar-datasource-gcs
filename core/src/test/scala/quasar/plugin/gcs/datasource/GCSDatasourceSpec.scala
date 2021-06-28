@@ -19,7 +19,7 @@ package quasar.plugin.gcs.datasource
 import quasar.blobstore.gcs.Bucket
 import quasar.contrib.scalaz.MonadError_
 import quasar.connector.ResourceError
-import quasar.connector.datasource.LightweightDatasourceModule
+import quasar.connector.datasource.DatasourceModule
 import quasar.physical.blobstore.BlobstoreDatasourceSpec
 
 import cats.effect.{IO, Resource}
@@ -36,7 +36,7 @@ class GCSDatasourceSpec extends BlobstoreDatasourceSpec {
     "precog-ci-275718-9de94866bc77.json",
     Bucket("precog-test-bucket"))
 
-  override def datasource: Resource[IO, LightweightDatasourceModule.DS[IO]] =
+  override def datasource: Resource[IO, DatasourceModule.DS[IO]] =
     GCSDatasource.mk[IO](log, cfg)
 }
 
