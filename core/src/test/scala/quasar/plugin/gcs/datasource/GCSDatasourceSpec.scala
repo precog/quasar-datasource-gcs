@@ -16,32 +16,12 @@
 
 package quasar.plugin.gcs.datasource
 
-import quasar.blobstore.gcs.Bucket
 import quasar.contrib.scalaz.MonadError_
 import quasar.connector.ResourceError
-import quasar.connector.datasource.DatasourceModule
-import quasar.physical.blobstore.BlobstoreDatasourceSpec
 
-import cats.effect.{IO, Resource}
-
-import org.slf4s.{Logger, LoggerFactory}
-
-class GCSDatasourceSpec extends BlobstoreDatasourceSpec {
-
-  import GCSDatasourceSpec._
-
-  val log: Logger = LoggerFactory("quasar.blobstore.gcs.GCSListServiceSpec")
-
-  val cfg = common.getGCSConfig(
-    "precog-ci-275718-9de94866bc77.json",
-    Bucket("precog-test-bucket"))
-
-  override def datasource: Resource[IO, DatasourceModule.DS[IO]] =
-    GCSDatasource.mk[IO](log, cfg)
-}
+import cats.effect.IO
 
 object GCSDatasourceSpec {
-
   implicit val ioMonadResourceErr: MonadError_[IO, ResourceError] =
     MonadError_.facet[IO](ResourceError.throwableP)
 }
