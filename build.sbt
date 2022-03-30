@@ -29,7 +29,7 @@ lazy val quasarVersion =
   Def.setting[String](managedVersions.value("precog-quasar"))
 
 val Specs2Version = "4.9.4"
-val Http4sVersion = "0.21.33"
+val Http4sVersion = "0.21.13"
 val Slf4sVersion = "1.7.25"
 
 lazy val root = project
